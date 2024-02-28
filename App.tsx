@@ -1,20 +1,42 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
+import { Container } from "./styles/appStyles";
+import { Alert, Text } from "react-native";
+import { useEffect } from "react";
 
 export default function App() {
+	const hibernateMyPC = async () => {
+		try {
+			const response = await fetch(
+				"http://192.168.50.225:1986/execute-command",
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({
+						command: "shutdown -h",
+					}),
+				}
+			);
+			if (!response.ok) {
+				throw new Error(`HTTP error! status: ${response.status}`);
+			}
+			const data = await response.json();
+			Alert.alert(data.message);
+		} catch (error) {
+			console.error(
+				"There was a problem with the fetch operation: " + error
+			);
+		}
+	};
+	useEffect(() => {
+		hibernateMyPC();
+	}, []);
+
 	return (
-		<View style={styles.container}>
-			<Text>Open up App.tsx to start working on your app!</Text>
+		<Container>
+			<Text>Good Night</Text>
 			<StatusBar style="auto" />
-		</View>
+		</Container>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: "#fff",
-		alignItems: "center",
-		justifyContent: "center",
-	},
-});
